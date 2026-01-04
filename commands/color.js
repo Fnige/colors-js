@@ -3,7 +3,7 @@ const { AttachmentBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Permis
 const { Constants } = require('discord.js');
 const { colorCanvas } = require('../utils/colorCanvas');
 const { guildGetRole } = require('../utils/database');
-const { missingPermsUser, missingPermsBot, invalidColor } = require('../utils/embeds');
+const { missingPermsUser, missingPermsBot, invalidColor, roleLimitReached } = require('../utils/embeds');
 
 const checkColor = (color) => {
 	return color.length < 8 && /^#[0-9A-F]{6}$/i.test(color);
@@ -112,14 +112,25 @@ module.exports = {
 							}
 							if (userRole == undefined) {
 								const highest = interaction.guild.members.me.roles.highest.position;
-								const colorRole = await interaction.guild.roles.create({
-									name: roleName,
-									color: color, // change
-									reason: 'Color role update by slash command',
-									position: highest,
-									permissions: [],
-								});
-								interaction.member.roles.add(colorRole);
+								let colorRole;
+								try {
+									colorRole = await interaction.guild.roles.create({
+										name: roleName,
+										color: color,
+										reason: 'Color role update by slash command',
+										position: highest,
+										permissions: [],
+									});
+									interaction.member.roles.add(colorRole);
+								} catch (error) {
+									if ((error && error.code === 30005) || (error && error.name === 'DiscordAPIError' && /Maximum number of server roles/i.test(error.message))) {
+										const errEmbed = roleLimitReached;
+										errEmbed.setImage('attachment://color.png');
+											await interaction.editReply({ embeds: [errEmbed], components: [], files:[file], ephemeral: false });
+											return;
+									}
+									throw error;
+								}
 							}
 							else {
 								if (!interaction.member.roles.cache.has(userRole)) {

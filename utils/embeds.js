@@ -17,4 +17,8 @@ module.exports = {
         .setTitle('Command failed!')
         .setColor(0xcc0000)
         .setDescription('I do not have the ability to edit or create your role.\nMake sure I have role permissions and that there are no user roles above me!'),
+    roleLimitReached: new EmbedBuilder()
+        .setTitle('Error')
+        .setColor(0xcc0000)
+        .setDescription('Maximum number of server roles reached (250). This bot is intended for smaller servers. Please ask a server admin to remove unused roles.'),
 };
