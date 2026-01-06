@@ -27,7 +27,7 @@ module.exports = {
         ctx.fillStyle = (brightnessByColor(colorString) < 0.35) ? 'white' : 'black';
         ctx.strokeStyle = (brightnessByColor(colorString) < 0.35) ? 'white' : 'black';
         ctx.lineWidth = 1;
-        ctx.strokeText(colorString, x, y + 10);
+        ctx.strokeText(colorString.toLowerCase(), x, y + 10);
 
         ctx.fillText(colorString.toLowerCase(), x, y + 10);
 
